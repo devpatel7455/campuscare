@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CampusCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    {% block extra_css %}
+    {% endblock %}
+</head>
+<body>
+    
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-handshake-angle"></i>
+            <h1>CampusCare</h1>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'new_complaint' %}" class="menu-item {% if active_page == 'new_complaint' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Complaint</span>
+        </a>
+
+        <a href="{% url 'my_complaints' %}" class="menu-item {% if active_page == 'my_complaints' %}active{% endif %}">
+            <i class="fas fa-list-check"></i>
+            <span>My Complaints</span>
+        </a>
+        <a href="{% url 'statistics' %}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Statistics</span>
+        </a>
+        
+        <a href="{% url 'ai_assistant' %}" class="menu-item">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </a>
+        <a href="{% url 'track_complaints' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>track</span>
+        </a>
+        <a href="{% url 'review' %}" class="menu-item">
+            <i class="fas fa-star"></i>
+            <span>Review</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+        <!-- Add other menu items here if needed -->
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Ask AI for help with your complaints..." />
+            </div>
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>Preyansh Shah</h4>
+                    <p>B.tech Student</p>
+                </div>
+                <div class="avatar">PS</div>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+    
+</body>
+</html>

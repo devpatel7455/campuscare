@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant | CampusCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'Ai_ass.css' %}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-handshake-angle"></i>
+            <h1>CampusCare</h1>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'new_complaint' %}" class="menu-item {% if active_page == 'new_complaint' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Complaint</span>
+        </a>
+
+        <a href="{% url 'my_complaints' %}" class="menu-item {% if active_page == 'my_complaints' %}active{% endif %}">
+            <i class="fas fa-list-check"></i>
+            <span>My Complaints</span>
+        </a>
+        <a href="{% url 'statistics' %}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Statistics</span>
+        </a>
+        
+        <a href="{% url 'ai_assistant' %}" class="menu-item">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </a>
+        <a href="{% url 'track_complaints' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>track</span>
+        </a>
+        <a href="{% url 'review' %}" class="menu-item">
+            <i class="fas fa-star"></i>
+            <span>Review</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Ask AI for help with your complaints...">
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+                    <p>{{ user.profile.department }}</p>
+                </div>
+                <div class="avatar">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</div>
+            </div>
+        </header>
+
+        <!-- AI Assistant Content -->
+        <div class="ai-assistant-container">
+            <div class="ai-header">
+                <div class="ai-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="ai-title">
+                    <h2>CampusCare AI Assistant</h2>
+                    <p>Get help with your complaints, ask questions, and get instant support</p>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>Complaint Support</h3>
+                    <div class="chat-status">
+                        <div class="status-indicator"></div>
+                        <span>AI Assistant is online</span>
+                    </div>
+                </div>
+                
+                <div class="chat-messages">
+                    <div class="message ai">
+                        <div>
+                            <div class="message-content">
+                                Hello {{ user.first_name }}! I'm your CampusCare AI Assistant. How can I help you with your complaints today?
+                            </div>
+                            <div class="message-time">10:00 AM</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" placeholder="Type your message here...">
+                    <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="action-card" data-action="new_complaint">
+                    <div class="action-icon"><i class="fas fa-plus-circle"></i></div>
+                    <h4>New Complaint</h4>
+                    <p>Create a new complaint with AI assistance</p>
+                </div>
+                <div class="action-card" data-action="check_status">
+                    <div class="action-icon"><i class="fas fa-list"></i></div>
+                    <h4>Check Status</h4>
+                    <p>Check your existing complaints status</p>
+                </div>
+                <div class="action-card" data-action="get_suggestions">
+                    <div class="action-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h4>Get Suggestions</h4>
+                    <p>AI tips to improve your complaints</p>
+                </div>
+                <div class="action-card" data-action="view_statistics">
+                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>View Statistics</h4>
+                    <p>See complaint trends and data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.querySelector('.chat-messages');
+            const chatInput = document.querySelector('.chat-input input');
+            const sendButton = document.querySelector('.chat-input button');
+
+            function addMessage(content, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                messageDiv.innerHTML = `<div><div class="message-content">${content}</div><div class="message-time">${timeString}</div></div>`;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatInput.value = '';
+            }
+
+            function getAIResponse(userInput) {
+                userInput = userInput.toLowerCase();
+                if (userInput.includes('internet')) return "Try restarting your router. If it doesn't help, provide room and device details.";
+                if (userInput.includes('complaint')) return "I can help submit a complaint. Describe your issue including location and time.";
+                if (userInput.includes('status')) return "You have 3 pending complaints. Internet issue is under review.";
+                if (userInput.includes('thank')) return "You're welcome! Anything else I can help with?";
+                return "I can help with complaints, checking status, or giving suggestions.";
+            }
+
+            sendButton.addEventListener('click', function() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    setTimeout(() => addMessage(getAIResponse(message), false), 1000);
+                }
+            });
+
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendButton.click();
+            });
+
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    let message = "";
+                    if (action === "new_complaint") message = "I'd like to create a new complaint";
+                    if (action === "check_status") message = "Can you show me the status of my complaints?";
+                    if (action === "get_suggestions") message = "What suggestions do you have for my complaints?";
+                    if (action === "view_statistics") message = "Show me my complaint statistics";
+                    addMessage(message, true);
+                    setTimeout(() => addMessage(getAIResponse(message), false), 1000);
+                });
+            });
+        });
+    </script>
+    <script src='https://cdn.jotfor.ms/agent/embedjs/0199469f769b72ac8f98653f29800c13d32a/embed.js'>
+</script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Statistics | CampusCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static 'stat.css' %}" />
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-handshake-angle"></i>
+            <h1>CampusCare</h1>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'new_complaint' %}" class="menu-item {% if active_page == 'new_complaint' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Complaint</span>
+        </a>
+
+        <a href="{% url 'my_complaints' %}" class="menu-item {% if active_page == 'my_complaints' %}active{% endif %}">
+            <i class="fas fa-list-check"></i>
+            <span>My Complaints</span>
+        </a>
+        <a href="{% url 'statistics' %}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Statistics</span>
+        </a>
+        
+        <a href="{% url 'ai_assistant' %}" class="menu-item">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </a>
+        <a href="{% url 'track_complaints' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>track</span>
+        </a>
+        <a href="{% url 'review' %}" class="menu-item">
+            <i class="fas fa-star"></i>
+            <span>Review</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search statistics..." />
+            </div>
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>{{ request.user.username }}</h4>
+                    <p>B.tech Student</p>
+                </div>
+                <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard">
+            <div class="page-header">
+                <h2>Complaint Statistics & Analytics</h2>
+                <div class="time-filter">
+                    <button class="active">Weekly</button>
+                    <button>Monthly</button>
+                    <button>Quarterly</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ total_complaints }}</h3>
+                        <p>Total Complaints</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ pending_complaints }}</h3>
+                        <p>Pending Complaints</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ resolved_complaints }}</h3>
+                        <p>Resolved Complaints</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ resolution_rate }}%</h3>
+                        <p>Resolution Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Complaints Overview</h3>
+                        <select>
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>Last 3 Months</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="complaintsTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Status Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="statusDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-distribution">
+                <div class="category-card">
+                    <div class="category-header">
+                        <h3>Complaints by Category</h3>
+                    </div>
+                    <div class="category-chart">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="category-card">
+                    <div class="category-header">
+                        <h3>Resolution Time by Category (Days)</h3>
+                    </div>
+                    <div class="category-chart">
+                        <canvas id="resolutionTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-insights">
+                <div class="ai-insights-header">
+                    <i class="fas fa-robot"></i>
+                    <h3>AI-Powered Insights</h3>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Faster Resolution Prediction</h4>
+                        <p>Technical complaints are resolved 35% faster when submitted with supporting media.</p>
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Pattern Detected</h4>
+                        <p>Internet connectivity issues peak on weekdays between 2-5 PM during exam periods.</p>
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Improvement Opportunity</h4>
+                        <p>Adding specific location details could reduce resolution time by up to 2 days for facility complaints.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</body>
+</html>

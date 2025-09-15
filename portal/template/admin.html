@@ -1,0 +1,323 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Complaint Management Dashboard</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="{% static 'admin.css' %}" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-headset"></i>
+            <h1>CompManage</h1>
+        </div>
+        
+        <div class="role-selector">
+            <button class="role-btn">
+                <i class="fas fa-user-tie"></i>
+                <span>Manager View</span>
+            </button>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'complaints' %}" class="nav-item">
+                <i class="fas fa-tasks"></i>
+                <span>Complaints</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Teams</span>
+            </a>
+
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+        
+        <div class="user-profile">
+            <div class="user-avatar">PS</div>
+            <div class="user-info">
+                <div class="user-name">Preyansh Shah</div>
+                <div class="user-role">Manager</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search complaints, users, or teams..." />
+            </div>
+            
+            <div class="header-actions">
+                <div class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-cog"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <!-- Status Overview -->
+            <div class="status-overview">
+                <div class="status-card">
+                    <div class="status-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="status-value">{{ total_complaints }}</div>
+                    <div class="status-label">Total Complaints</div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-icon"><i class="fas fa-clock"></i></div>
+                    <div class="status-value">{{ pending_complaints }}</div>
+                    <div class="status-label">Pending Resolution</div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="status-value">{{ resolved_complaints }}</div>
+                    <div class="status-label">Resolved</div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-icon"><i class="fas fa-stopwatch"></i></div>
+                    <div class="status-value">2</div>
+                    <div class="status-label">Avg. Resolution (Days)</div>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-container">
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Complaint Trends</h3>
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <div class="stat-value">+12%</div>
+                    <div class="stat-label">Increase from last month</div>
+                    <div class="stat-change positive"><i class="fas fa-arrow-up"></i> Improved performance</div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Satisfaction Rate</h3>
+                        <div class="card-icon"><i class="fas fa-smile"></i></div>
+                    </div>
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">Customer satisfaction score</div>
+                    <div class="stat-change positive"><i class="fas fa-arrow-up"></i> 5% from last quarter</div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Team Performance</h3>
+                        <div class="card-icon"><i class="fas fa-medal"></i></div>
+                    </div>
+                    <div class="stat-value">86%</div>
+                    <div class="stat-label">Efficiency rating</div>
+                    <div class="stat-change positive"><i class="fas fa-arrow-up"></i> 7% from last month</div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Response Time</h3>
+                        <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                    </div>
+                    <div class="stat-value">3.2h</div>
+                    <div class="stat-label">Average first response</div>
+                    <div class="stat-change negative"><i class="fas fa-arrow-up"></i> 0.4h longer than target</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card quick-actions">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Actions</h3>
+                    <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn"><i class="fas fa-plus-circle"></i>
+                        <div>
+                            <div>Register New Complaint</div>
+                            <small>Submit a new issue ticket</small>
+                        </div>
+                    </button>
+                    <button class="action-btn"><i class="fas fa-tasks"></i>
+                        <div>
+                            <div>View My Tasks</div>
+                            <small>Assigned complaints and status</small>
+                        </div>
+                    </button>
+                    <button class="action-btn"><i class="fas fa-chart-pie"></i>
+                        <div>
+                            <div>Generate Reports</div>
+                            <small>Create performance reports</small>
+                        </div>
+                    </button>
+                    <button class="action-btn"><i class="fas fa-cog"></i>
+                        <div>
+                            <div>System Settings</div>
+                            <small>Configure application settings</small>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Complaints by Category</h3>
+                        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                    </div>
+                    <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Weekly Resolution Rate</h3>
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <div class="chart-container"><canvas id="resolutionChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card recent-activity">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Activity</h3>
+                    <div class="card-icon"><i class="fas fa-history"></i></div>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-title">Complaint #289 Resolved</div>
+                            <div class="activity-desc">Network connectivity issue fixed</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-exclamation-circle"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-title">New High Priority Complaint</div>
+                            <div class="activity-desc">Server downtime reported</div>
+                            <div class="activity-time">5 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-plus-circle"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-title">New Complaint Registered</div>
+                            <div class="activity-desc">Printer not working in Office B</div>
+                            <div class="activity-time">Yesterday</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-user-plus"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-title">New Technician Added</div>
+                            <div class="activity-desc">Sarah Johnson joined IT team</div>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Technical', 'Management', 'Facilities', 'IT', 'Other'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: ['#4361ee', '#7209b7', '#f8961e', '#4cc9f0', '#6c757d'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Resolution Chart
+            const resolutionCtx = document.getElementById('resolutionChart').getContext('2d');
+            new Chart(resolutionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Resolution Rate (%)',
+                        data: [65, 70, 75, 80, 85, 70, 65],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: false, min: 50, max: 100 }
+                    }
+                }
+            });
+
+            // Hover Effects
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-5px)';
+                    card.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.1)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.05)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

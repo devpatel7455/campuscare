@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | CampusCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'noti.css' %}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-handshake-angle"></i>
+            <h1>CampusCare</h1>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'new_complaint' %}" class="menu-item {% if active_page == 'new_complaint' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Complaint</span>
+        </a>
+
+        <a href="{% url 'my_complaints' %}" class="menu-item {% if active_page == 'my_complaints' %}active{% endif %}">
+            <i class="fas fa-list-check"></i>
+            <span>My Complaints</span>
+        </a>
+        <a href="{% url 'statistics' %}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Statistics</span>
+        </a>
+        
+        <a href="{% url 'ai_assistant' %}" class="menu-item">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </a>
+        <a href="{% url 'track_complaints' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>track</span>
+        </a>
+        <a href="{% url 'review' %}" class="menu-item">
+            <i class="fas fa-star"></i>
+            <span>Review</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search notifications...">
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>{{ request.user.get_full_name }}</h4>
+                    <p>B.Tech Student</p>
+                </div>
+                <div class="avatar">{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}</div>
+            </div>
+        </header>
+
+        <!-- Notification Content -->
+        <div class="notification-container">
+            <div class="page-header">
+                <h2>Notifications</h2>
+                <div class="notification-actions">
+                    <button class="action-btn" id="mark-all-read">
+                        <i class="fas fa-check-circle"></i>
+                        Mark All as Read
+                    </button>
+                    <button class="action-btn" id="clear-all">
+                        <i class="fas fa-trash-alt"></i>
+                        Clear All
+                    </button>
+                    <button class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        Notification Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification Tabs -->
+            <div class="notification-tabs">
+                <div class="tab active">All <span class="tab-badge">{{ notifications|length }}</span></div>
+                
+                <div class="tab">Complaints</div>
+                <div class="tab">AI Suggestions</div>
+                <div class="tab">System</div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-header"><h3>Filter By</h3></div>
+                <div class="filter-options">
+                    <div class="filter-option active">Today</div>
+                    <div class="filter-option">Last 7 Days</div>
+                    <div class="filter-option">This Month</div>
+                    <div class="filter-option">High Priority</div>
+                    <div class="filter-option">Resolved</div>
+                </div>
+            </div>
+
+            <!-- Notification Cards -->
+            <div class="notification-cards">
+                {% for notif in notifications %}
+                <div class="notification-card {% if not notif.is_read %}unread{% endif %}" data-id="{{ notif.id }}">
+                    <div class="notification-icon {% if notif.notif_type == 'complaint' %}primary{% elif notif.notif_type == 'ai' %}success{% else %}warning{% endif %}">
+                        {% if notif.notif_type == 'complaint' %}
+                            <i class="fas fa-check-circle"></i>
+                        {% elif notif.notif_type == 'ai' %}
+                            <i class="fas fa-robot"></i>
+                        {% else %}
+                            <i class="fas fa-bell"></i>
+                        {% endif %}
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notif.title }}</div>
+                        <div class="notification-desc">{{ notif.description }}</div>
+                        <div class="notification-time">{{ notif.created_at|date:"M d, Y, h:i A" }}</div>
+                    </div>
+                    <div class="notification-actions-menu">
+                        <div class="notification-action mark-read" data-id="{{ notif.id }}">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="notification-action delete-notif" data-id="{{ notif.id }}">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No notifications found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            }));
+
+            // Filter options
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => option.addEventListener('click', function() {
+                filterOptions.forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+            }));
+
+            // Mark as read
+            document.querySelectorAll('.mark-read').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.notification-card');
+                    card.classList.remove('unread');
+                    // TODO: AJAX call to mark as read in backend
+                });
+            });
+
+            // Delete notification
+            document.querySelectorAll('.delete-notif').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.notification-card');
+                    card.remove();
+                    // TODO: AJAX call to delete in backend
+                });
+            });
+
+            // Mark all as read
+            document.getElementById('mark-all-read').addEventListener('click', function() {
+                document.querySelectorAll('.notification-card.unread').forEach(card => card.classList.remove('unread'));
+                // TODO: AJAX call to mark all as read
+            });
+
+            // Clear all
+            document.getElementById('clear-all').addEventListener('click', function() {
+                document.querySelectorAll('.notification-card').forEach(card => card.remove());
+                // TODO: AJAX call to delete all notifications
+            });
+        });
+    </script>
+</body>
+</html>

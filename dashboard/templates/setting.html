@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | CampusCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'setting.css' %}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-handshake-angle"></i>
+            <h1>CampusCare</h1>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'new_complaint' %}" class="menu-item {% if active_page == 'new_complaint' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Complaint</span>
+        </a>
+
+        <a href="{% url 'my_complaints' %}" class="menu-item {% if active_page == 'my_complaints' %}active{% endif %}">
+            <i class="fas fa-list-check"></i>
+            <span>My Complaints</span>
+        </a>
+        <a href="{% url 'statistics' %}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Statistics</span>
+        </a>
+        
+        <a href="{% url 'ai_assistant' %}" class="menu-item">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </a>
+        <a href="{% url 'track_complaints' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>track</span>
+        </a>
+        <a href="{% url 'review' %}" class="menu-item">
+            <i class="fas fa-star"></i>
+            <span>Review</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Ask AI for help with your complaints...">
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+                    <p>{{ user.profile.department }}</p>
+                </div>
+                <div class="avatar">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</div>
+            </div>
+        </header>
+
+        <!-- Settings Content -->
+        <div class="settings-container">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <p>Manage your account preferences and settings</p>
+            </div>
+
+            <!-- Profile Settings -->
+            <form method="POST">
+                {% csrf_token %}
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <i class="fas fa-user"></i>
+                        <h3>Profile Information</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="two-column">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" name="firstName" class="form-control" value="{{ user.first_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" name="lastName" class="form-control" value="{{ user.last_name }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" value="{{ user.profile.phone }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <input type="text" id="department" name="department" class="form-control" value="{{ user.profile.department }}">
+                        </div>
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="reset" class="btn btn-outline">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Notification & Privacy Sections (Static toggles) -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <i class="fas fa-bell"></i>
+                    <h3>Notification Preferences</h3>
+                </div>
+                <div class="settings-card-body">
+                    <!-- Example toggles -->
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Email Notifications</h4>
+                            <p>Receive important updates via email</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" {% if user.profile.email_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Push Notifications</h4>
+                            <p>Get instant alerts on your device</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" {% if user.profile.push_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

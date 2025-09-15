@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'newcom.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="complaint-form-container">
+    <div class="form-header">
+        <h2>File a New Complaint</h2>
+        <p>Report an issue you're experiencing on campus</p>
+    </div>
+
+    <form class="complaint-form" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Complaint Details -->
+        <div class="form-section">
+            <h3 class="section-title"><i class="fas fa-info-circle"></i> Complaint Details</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Complaint Category</label>
+                    <select name="category" class="form-control" required>
+                        <option value="">Select a category</option>
+                        <option value="technical">Technical</option>
+                        <option value="management">Management</option>
+                        <option value="facilities">Facilities</option>
+                        <option value="it">IT (Information Technology)</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Priority Level</label>
+                    <input type="hidden" name="priority" value="medium" id="priority-input">
+                    <div class="priority-tags">
+                        <div class="priority-tag" onclick="selectPriority(this, 'low')">
+                            <h4 class="priority-low">Low</h4>
+                            <p>Non-urgent issue</p>
+                        </div>
+                        <div class="priority-tag selected" onclick="selectPriority(this, 'medium')">
+                            <h4 class="priority-medium">Medium</h4>
+                            <p>Needs attention</p>
+                        </div>
+                        <div class="priority-tag" onclick="selectPriority(this, 'high')">
+                            <h4 class="priority-high">High</h4>
+                            <p>Urgent issue</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Complaint Title</label>
+                <input type="text" name="title" class="form-control" placeholder="Brief description of your issue" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Complaint Description</label>
+                <textarea name="description" class="form-control" placeholder="Please provide detailed information about your complaint" required></textarea>
+                <p class="form-hint">Be as specific as possible. Include location, time, and other relevant details.</p>
+            </div>
+        </div>
+        
+        <!-- Location Details -->
+        <div class="form-section">
+            <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Location Details</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Building</label>
+                    <select name="building" class="form-control" required>
+                        <option value="">Select building</option>
+                        <option>Main Academic Building</option>
+                        <option>Science & Technology Center</option>
+                        <option>Library</option>
+                        <option>Student Center</option>
+                        <option>Dormitory A</option>
+                        <option>Dormitory B</option>
+                        <option>Sports Complex</option>
+                        <option>Cafeteria</option>
+                        <option>Administration Building</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Floor / Room Number</label>
+                    <input type="text" name="floor" class="form-control" placeholder="E.g., 3rd Floor, Room 304">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Additional Location Details</label>
+                <textarea name="location_additional" class="form-control" placeholder="Any additional information to help locate the issue"></textarea>
+            </div>
+        </div>
+        
+        <!-- Attachment -->
+        <div class="form-section">
+            <h3 class="section-title"><i class="fas fa-paperclip"></i> Attachments (Optional)</h3>
+            
+            <div class="form-group">
+                <div class="file-upload" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to upload images or documents</p>
+                    <span>Maximum file size: 5MB (JPG, PNG, PDF)</span>
+                    <input type="file" name="attachment" id="file-input" hidden accept="image/*,.pdf">
+                </div>
+                <p class="form-hint">Upload photos or documents that might help us understand your complaint better.</p>
+            </div>
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="form-section">
+            <h3 class="section-title"><i class="fas fa-user"></i> Your Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="student_name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Student ID</label>
+                    <input type="text" name="student_id" class="form-control" placeholder="Enter your student ID" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="Enter your phone number">
+                    <p class="form-hint">Optional - for urgent contact regarding your complaint</p>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="form-check">
+                    <input type="checkbox" name="anonymous" id="anonymous" class="form-check-input">
+                    <label for="anonymous" class="form-check-label">Submit anonymously</label>
+                </div>
+                <p class="form-hint">If checked, your personal information will not be shared with the resolution team.</p>
+            </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">Submit Complaint</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function selectPriority(element, level) {
+        document.querySelectorAll('.priority-tag').forEach(tag => {
+            tag.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        document.getElementById('priority-input').value = level;
+    }
+</script>
+<script src='https://cdn.jotfor.ms/agent/embedjs/0199469f769b72ac8f98653f29800c13d32a/embed.js'>
+</script>
+{% endblock %}

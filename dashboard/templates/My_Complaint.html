@@ -1,0 +1,142 @@
+{% load static %}
+{% load static humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Complaints | CampusCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'mycom.css' %}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-handshake-angle"></i>
+            <h1>CampusCare</h1>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'new_complaint' %}" class="menu-item {% if active_page == 'new_complaint' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Complaint</span>
+        </a>
+
+        <a href="{% url 'my_complaints' %}" class="menu-item {% if active_page == 'my_complaints' %}active{% endif %}">
+            <i class="fas fa-list-check"></i>
+            <span>My Complaints</span>
+        </a>
+        <a href="{% url 'statistics' %}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Statistics</span>
+        </a>
+        
+        <a href="{% url 'ai_assistant' %}" class="menu-item">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </a>
+        <a href="{% url 'track_complaints' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>track</span>
+        </a>
+        <a href="{% url 'review' %}" class="menu-item">
+            <i class="fas fa-star"></i>
+            <span>Review</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search complaints...">
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>Preyansh Shah</h4>
+                    <p>B.tech Student</p>
+                </div>
+                <div class="avatar">PS</div>
+            </div>
+        </header>
+
+        <!-- Complaints Content -->
+        <div class="dashboard">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2 class="page-title">My Complaints</h2>
+                <a href="{% url 'new_complaint' %}" class="new-complaint-btn">
+                    <i class="fas fa-plus"></i> New Complaint
+                </a>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <button class="filter-btn active">All Complaints</button>
+                <button class="filter-btn">New</button>
+                <button class="filter-btn">In Progress</button>
+                <button class="filter-btn">Resolved</button>
+                <div class="search-filter">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search complaints...">
+                </div>
+            </div>
+
+            <!-- Complaints Container -->
+            <div class="complaints-container">
+                {% for complaint in complaints %}
+                <div class="complaint-card">
+                    <div class="complaint-header">
+                        <div>
+                            <h3 class="complaint-title">{{ complaint.title }}</h3>
+                            <div class="complaint-category">
+                                <i class="fas fa-circle"></i> {{ complaint.get_category_display }}
+                            </div>
+                        </div>
+                        <span class="complaint-status status-{{ complaint.status|lower }}">{{ complaint.get_status_display }}</span>
+                    </div>
+                    <div class="complaint-details">
+                        <p>{{ complaint.description|truncatewords:30 }}</p>
+                    </div>
+                    <div class="complaint-meta">
+                        <div class="complaint-date">
+                            <i class="far fa-calendar"></i> Submitted: {{ complaint.submitted_at|naturaltime }}
+                        </div>
+                        <div class="complaint-id">#{{ complaint.complaint_id }}</div>
+                    </div>
+                    <div class="complaint-actions">
+                        <a href="{% url 'view_complaint' complaint.complaint_id %}" class="action-btn view-btn">View Details</a>
+                        <a href="{% url 'update_complaint' complaint.complaint_id %}" class="action-btn update-btn">Update</a>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No complaints found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'mycom.js' %}"></script>
+</body>
+</html>

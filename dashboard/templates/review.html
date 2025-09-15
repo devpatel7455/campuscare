@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review | CampusCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'Review.css' %}">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-handshake-angle"></i>
+            <h1>CampusCare</h1>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'new_complaint' %}" class="menu-item {% if active_page == 'new_complaint' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Complaint</span>
+        </a>
+
+        <a href="{% url 'my_complaints' %}" class="menu-item {% if active_page == 'my_complaints' %}active{% endif %}">
+            <i class="fas fa-list-check"></i>
+            <span>My Complaints</span>
+        </a>
+        <a href="{% url 'statistics' %}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Statistics</span>
+        </a>
+        
+        <a href="{% url 'ai_assistant' %}" class="menu-item">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </a>
+        <a href="{% url 'track_complaints' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>track</span>
+        </a>
+        <a href="{% url 'review' %}" class="menu-item">
+            <i class="fas fa-star"></i>
+            <span>Review</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="menu-item">
+            <i class="fas fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search reviews...">
+            </div>
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>{{ request.user.get_full_name }}</h4>
+                    <p>B.Tech Student</p>
+                </div>
+                <div class="avatar">{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}</div>
+            </div>
+        </header>
+
+        <div class="review-container">
+            <div class="page-header">
+                <h2>Complaint Reviews & Feedback</h2>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h3>{{ average_rating|default:"N/A" }}</h3>
+                    <p>Average Rating</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reviews_submitted|default:"0" }}</h3>
+                    <p>Reviews Submitted</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ pending_reviews|default:"0" }}</h3>
+                    <p>Pending Reviews</p>
+                </div>
+            </div>
+
+            <div class="review-sections">
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <h3>Complaints Awaiting Review</h3>
+                    </div>
+                    <div class="complaints-list">
+                        {% if complaints %}
+                            {% for complaint in complaints %}
+                            <div class="complaint-item">
+                                <div class="complaint-info">
+                                    <h4>{{ complaint.title }}</h4>
+                                    <p>Resolved on: {{ complaint.resolved_date|default:"N/A" }} • {{ complaint.location|default:"N/A" }}</p>
+                                </div>
+                                <button type="button" class="review-btn" data-id="{{ complaint.id }}">Review Now</button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>No complaints awaiting review.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <h3>Submit a Review</h3>
+                    </div>
+                    <form method="POST" id="review-form" action="{% url 'review' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="complaint_id" id="complaint-id">
+                        <div class="rating-system">
+                            <div class="rating-title">Rate your experience with this complaint resolution</div>
+                            <div class="stars">
+                                {% for i in "12345" %}
+                                <i class="fas fa-star star" data-value="{{ forloop.counter }}"></i>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="rating" id="rating">
+                            <div class="rating-labels">
+                                <span>Poor</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                        <div class="review-form">
+                            <div class="form-group">
+                                <label for="review-text">Your Review</label>
+                                <textarea id="review-text" name="text" placeholder="Share details of your experience..." required></textarea>
+                            </div>
+                            <button type="submit" class="submit-review">Submit Review</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-card-header">
+                    <h3>Your Recent Reviews</h3>
+                </div>
+                <div class="reviews-list">
+                    {% if recent_reviews %}
+                        {% for review in recent_reviews %}
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="reviewer">{{ review.complaint.title }}</div>
+                                <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="review-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="review-content">{{ review.text }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No reviews submitted yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.star');
+            const ratingInput = document.getElementById('rating');
+            const complaintIdInput = document.getElementById('complaint-id');
+            const form = document.getElementById('review-form');
+            let currentRating = 0;
+
+            function updateStars() {
+                stars.forEach(star => {
+                    star.classList.toggle('active', parseInt(star.dataset.value) <= currentRating);
+                });
+            }
+
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    currentRating = parseInt(star.dataset.value);
+                    ratingInput.value = currentRating;
+                    updateStars();
+                });
+                star.addEventListener('mouseover', () => {
+                    stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value) <= parseInt(star.dataset.value)));
+                });
+                star.addEventListener('mouseout', () => updateStars());
+            });
+
+            document.querySelectorAll('.review-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    complaintIdInput.value = btn.dataset.id;
+                    document.getElementById('review-text').focus();
+                    window.scrollTo({ top: form.offsetTop, behavior: 'smooth' });
+                });
+            });
+
+            form.addEventListener('submit', function(e) {
+                if (!complaintIdInput.value) {
+                    alert("Please select a complaint to review.");
+                    e.preventDefault();
+                } else if (!ratingInput.value) {
+                    alert("Please provide a rating.");
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
